@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Review sentiment analyzer</title>
+    <style>
+      body { background: #f6f8fb; color: #172033; font-family: system-ui, sans-serif; margin: 0; }
+      main { max-width: 720px; margin: 64px auto; padding: 32px; background: white; border-radius: 16px; box-shadow: 0 8px 28px #17203318; }
+      h1 { margin: 0; } textarea { box-sizing: border-box; font: inherit; height: 150px; margin: 20px 0 12px; padding: 12px; width: 100%; }
+      button { background: #1769e0; border: 0; border-radius: 6px; color: white; font: inherit; font-weight: 700; padding: 11px 18px; }
+      .result, .error { margin-top: 24px; padding: 18px; border-radius: 8px; } .result { background: #eaf2ff; } .error { background: #ffe9e8; }
+      .label { font-size: 1.35rem; font-weight: 700; text-transform: capitalize; } code { background: #fff; padding: 3px 6px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Review sentiment analyzer</h1>
+      <p>Classify a product review as positive, negative, or neutral with a local, explainable ML model.</p>
+      <form action="/analyze" method="post">
+        <label for="text">Review text</label>
+        <textarea id="text" name="text" placeholder="This product is easy to use and works perfectly.">{{ text or "" }}</textarea>
+        <button type="submit">Analyze sentiment</button>
+      </form>
+      {% if prediction %}
+        <section class="result">
+          <div class="label">{{ prediction.label }}</div>
+          <p>Confidence: {{ "%.0f"|format(prediction.confidence * 100) }}%</p>
+          <p>Strongest recognized signals: {% if prediction.influential_words %}{% for word in prediction.influential_words %}<code>{{ word }}</code> {% endfor %}{% else %}none{% endif %}</p>
+        </section>
+      {% endif %}
+      {% if error %}<p class="error">{{ error }}</p>{% endif %}
+      <section>
+        <h2>Recent analyses</h2>
+        {% if history %}
+          <ul>{% for item in history %}<li><strong>{{ item.label }}</strong> ({{ "%.0f"|format(item.confidence * 100) }}%): {{ item.text }}</li>{% endfor %}</ul>
+        {% else %}<p>No saved analyses yet.</p>{% endif %}
+      </section>
+    </main>
+  </body>
+</html>
