@@ -1,6 +1,6 @@
 # Review Sentiment Service
 
-A trainable, explainable sentiment-analysis service for product reviews. It provides a Flask interface, JSON API, SQLite-backed prediction history, persisted model artifact, and a reproducible training workflow.
+A trainable, explainable FastAPI sentiment-analysis service for product reviews. It provides an HTML interface, JSON API, SQLite-backed prediction history, persisted model artifact, and a reproducible training workflow.
 
 ## Architecture
 
@@ -28,7 +28,7 @@ python train.py
 python app.py
 ```
 
-Open `http://127.0.0.1:5000`.
+Run `uvicorn app:app --reload`, then open `http://127.0.0.1:8000`.
 
 ## API
 
@@ -47,3 +47,9 @@ TF-IDF turns text into weighted word and phrase features. Logistic regression is
 ## Limitations
 
 The starter dataset is deliberately small and transparent. A production system needs a representative labelled dataset, evaluation across relevant user groups, monitoring, and protections against input abuse. It can also miss sarcasm and domain-specific language.
+
+## Transformer comparison
+
+The TF-IDF and logistic-regression model is the fast baseline. Install `pip install -e ".[transformer]"` and call `comparison.classify_with_distilbert()` to compare it with DistilBERT on the same reviews. The transformer download is optional and is not required to run the service.
+
+Install `pip install -e ".[explain]"` to use the optional LIME explanation helper for local explanations beyond the baseline model's influential-term view.
