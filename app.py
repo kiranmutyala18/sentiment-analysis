@@ -60,3 +60,9 @@ def create_app(model_path: str | Path = MODEL_PATH, database_path: str | Path = 
 
 
 app = create_app()
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
