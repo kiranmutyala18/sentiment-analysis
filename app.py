@@ -17,8 +17,25 @@ class AnalyzeRequest(BaseModel):
     text: str = Field(min_length=1, max_length=10_000)
 
 
+def _ensure_model(model_path: str | Path) -> SentimentModel:
+    model_file = Path(model_path)
+    if model_file.exists():
+        return SentimentModel.load(model_file)
+
+    data_file = Path("data/reviews.csv")
+    if not data_file.exists():
+        raise FileNotFoundError(f"Model not found at {model_file} and dataset not found at {data_file}.")
+
+    from train import load_dataset
+
+    texts, labels = load_dataset(data_file)
+    model = SentimentModel.train(texts, labels)
+    model.save(model_file)
+    return model
+
+
 def create_app(model_path: str | Path = MODEL_PATH, database_path: str | Path = "data/predictions.db") -> FastAPI:
-    model = SentimentModel.load(model_path)
+    model = _ensure_model(model_path)
     store = PredictionStore(database_path)
     templates = Jinja2Templates(directory="templates")
     app = FastAPI(title="Review Sentiment Service", version="0.3.0")
