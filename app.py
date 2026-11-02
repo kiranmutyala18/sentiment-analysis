@@ -22,6 +22,8 @@ def _ensure_model(model_path: str | Path) -> SentimentModel:
     if model_file.exists():
         return SentimentModel.load(model_file)
 
+    # Booting the app should not fail if the trained artifact has not been created yet.
+    # In that case, train from the bundled dataset and persist the model for future runs.
     data_file = Path("data/reviews.csv")
     if not data_file.exists():
         raise FileNotFoundError(f"Model not found at {model_file} and dataset not found at {data_file}.")
@@ -30,6 +32,7 @@ def _ensure_model(model_path: str | Path) -> SentimentModel:
 
     texts, labels = load_dataset(data_file)
     model = SentimentModel.train(texts, labels)
+    model_file.parent.mkdir(parents=True, exist_ok=True)
     model.save(model_file)
     return model
 
